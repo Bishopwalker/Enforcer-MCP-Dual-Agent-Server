@@ -61,6 +61,7 @@ Tools Cheat Sheet
 - `codex_context_index` / `codex_context_init` — generate `.codex/context_index.json`.
 - `codex_prune_dryrun` — analyze and propose extra files/unused symbols (no writes).
 - `codex_prune_apply` — apply prune (backup first), optional language targeting.
+  - Requires `confirm=true`. The underlying apply will not execute without explicit confirmation (safety guard).
 
 Triple Verification (Rule Enforcement Loop)
 - Purpose: prevent agents from drifting from instructions by cross‑checking work.

@@ -1,0 +1,67 @@
+stages:
+  - analyze
+  - build
+  - release
+
+variables:
+  PYTHONUNBUFFERED: "1"
+
+analyze:enforce_dryrun:
+  stage: analyze
+  image: python:3.11-slim
+  script:
+    - python -c "import sys; sys.path.insert(0,'.'); from codex_mcp_server import CodexEnforcer; import json; import os; E=CodexEnforcer(); rep = E.workspace_root; r = __import__('asyncio').get_event_loop().run_until_complete(E.enforce_quality([str(rep)], auto_fix=True, dry_run=True, title='ci_enforce_dryrun', module='ci')); print(json.dumps({'score': r.score, 'pristine': r.pristine}))"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - .codex/reports/
+      - .codex/activity.log
+
+analyze:rag_context:
+  stage: analyze
+  image: python:3.11-slim
+  script:
+    - python - <<'PY'
+import sys, json
+sys.path.insert(0,'.')
+from codex_mcp_server import CodexEnforcer
+E = CodexEnforcer()
+out = E.build_rag_context(["."], title="ci_rag", module="ci")
+print(json.dumps(out))
+PY
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - .codex/enforcer_logs/
+
+build:package:
+  stage: build
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache zip
+  script:
+    - mkdir -p dist
+    - zip -r dist/enforcer-coding-ai-assistant.zip . -x "*.git*" -x "*.venv*" -x "__pycache__/*"
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - dist/enforcer-coding-ai-assistant.zip
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - echo "Creating release $CI_COMMIT_TAG"
+  release:
+    tag_name: "$CI_COMMIT_TAG"
+    name: "Release $CI_COMMIT_TAG"
+    description: "Automated release"
+    assets:
+      links:
+        - name: "enforcer-coding-ai-assistant.zip"
+          url: "${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/file/dist/enforcer-coding-ai-assistant.zip"
+

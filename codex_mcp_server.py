@@ -653,9 +653,20 @@ class CodexEnforcer:
         self._log_activity('prune_dryrun', {'roots': roots, 'report': str(out)})
         return result
 
-    def prune_apply(self, roots: List[str], entry_points: Optional[List[str]] = None, languages: Optional[List[str]] = None) -> Dict[str, Any]:
-        """Apply prune by deleting extra files and removing unused top-level symbols. Creates backups."""
+    def prune_apply(self, roots: List[str], entry_points: Optional[List[str]] = None, languages: Optional[List[str]] = None, confirm: bool = False) -> Dict[str, Any]:
+        """Apply prune by deleting extra files and removing unused top-level symbols. Creates backups.
+        Safety: requires confirm=True; otherwise returns a preview-only result and an error.
+        """
+        # Safety guard: require explicit confirmation even for direct method calls
         res = self.prune_dryrun(roots, entry_points, languages)
+        if not confirm:
+            return {
+                "deleted_files": [],
+                "edited_files": [],
+                "errors": ["apply_blocked:confirm_required"],
+                "backup_dir": None,
+                "preview": res
+            }
         ts = datetime.now().isoformat().replace(':','-')
         backup_root = self.codex_dir / f"prune_backups/{ts}"
         backup_root.mkdir(parents=True, exist_ok=True)
@@ -1642,7 +1653,8 @@ async def call_tool(name: str, arguments: Dict[str, Any]):
         applied = enforcer.prune_apply(
             arguments.get("roots", []),
             arguments.get("entry_points"),
-            arguments.get("languages")
+            arguments.get("languages"),
+            confirm=True
         )
         enforcer._write_logs("prune_apply", {"timestamp": datetime.now().isoformat(), **applied}, arguments.get("title"), arguments.get("module"))
         return [mcp.TextContent(type="text", text=json.dumps(applied, indent=2))]
