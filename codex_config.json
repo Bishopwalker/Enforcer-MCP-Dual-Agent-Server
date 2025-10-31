@@ -1,0 +1,46 @@
+{
+  "mode": "strict",
+  "max_file_lines": 3000,
+  "remove_prints": true,
+  "remove_todos": false,
+  "preserve_docblocks": true,
+  "ignore_tests_for_prints": true,
+  "extensions": [
+    ".py", ".pyi",
+    ".js", ".jsx", ".cjs", ".mjs", ".ts", ".tsx",
+    ".go", ".rs",
+    ".sh", ".bat",
+    ".md", ".json", ".yaml", ".yml"
+  ],
+  "include": [],
+  "exclude": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    "**/venv/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/__pycache__/**",
+    "**/.pytest_cache/**",
+    "**/.mypy_cache/**",
+    "**/coverage/**",
+    "**/.cache/**",
+    "**/.next/**",
+    "**/out/**",
+    "**/target/**",
+    "**/.vite/**"
+  ],
+  "length_exempt_patterns": [
+    "**/.vite/**",
+    "**/*lock*.json",
+    "**/package-lock.json",
+    "**/*.json",
+    "**/*.md"
+  ],
+  "allowed_roots": [
+    "C:\\Users\\bisho\\.npm-global",
+    "C:\\Users\\bisho\\IdeaProjects\\UNIVERSAL_CONTEXT_TEMPLATE",
+    "C:\\Users\\bisho\\IdeaProjects\\ebl"
+  ],
+  "rules_dir": "C:\\Users\\bisho\\.claude"
+}

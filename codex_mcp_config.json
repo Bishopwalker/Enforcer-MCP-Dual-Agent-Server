@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codex-enforcer": {
+      "command": "python",
+      "args": ["C:\\Users\\bisho\\.claude\\codex_mcp_server.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      },
+      "description": "Codex Enforcer - Dual-agent code quality enforcement system"
+    }
+  }
+}
